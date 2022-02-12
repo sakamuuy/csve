@@ -1,14 +1,14 @@
-class Store {
-  private static _instance: Store;
+export class CSVStore {
+  private static _instance: CSVStore;
   private _csvData: string[][] | null;
 
   constructor() {
     this._csvData = null;
   }
 
-  public static get instance(): Store {
+  public static get instance(): CSVStore {
     if (!this._instance) {
-      this._instance = new Store();
+      this._instance = new CSVStore();
     }
 
     return this._instance;
