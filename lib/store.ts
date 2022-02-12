@@ -1,7 +1,12 @@
 import { EventEmitter } from 'events'
+
+type CSVData = {
+  header: string[],
+  body: string[][],
+}
 export class CSVStore extends EventEmitter {
   private static _instance: CSVStore;
-  private _csvData: string[][] | null;
+  private _csvData: CSVData | null;
 
   constructor() {
     super();
@@ -20,7 +25,7 @@ export class CSVStore extends EventEmitter {
     return this._csvData;
   }
 
-  public set csvData(data: string[][] | null) {
+  public set csvData(data: CSVData | null) {
     if (data === null) return;
 
     this._csvData = data;

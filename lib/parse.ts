@@ -2,7 +2,7 @@ import * as fs from "fs";
 import { CSVStore } from "./store";
 import { DEFAULT_DELIMITER, getNewlineCharacterReg } from "./token";
 
-function csv2Array(dataStr: string): string[][] {
+function parseCSV(dataStr: string): string[][] {
   // TODO: Handle line break in cell
   const rows = dataStr.split(getNewlineCharacterReg());
   return rows.map((row) => {
@@ -20,11 +20,16 @@ function createTargetReadStream(
   rs.on("data", (chunk) => {
     let data: string[][];
     if (typeof chunk === "string") {
-      data = csv2Array(chunk);
+      data = parseCSV(chunk);
     } else {
-      data = csv2Array(chunk.toString());
+      data = parseCSV(chunk.toString());
     }
-    onData(data);
+    // TODO: Handle that if the header size is learger than chunk.
+    const header = data.shift()
+    onData({
+      header: header?? [],
+      body: data
+    });
   });
 
   rs.on("end", () => {
@@ -34,7 +39,7 @@ function createTargetReadStream(
   return rs;
 }
 
-export function parseCSV(
+export function parse(
   filePath: string,
   onData: (data: CSVStore["csvData"]) => void
 ) {
