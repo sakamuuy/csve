@@ -1,3 +1,4 @@
+import { launchEditor } from "./editor";
 import { parseCSV } from "./parse";
 import { CSVStore } from "./store";
 
@@ -10,6 +11,7 @@ export function csve(argv: NodeJS.Process["argv"]) {
     parseCSV(targetFilePath, (data: CSVStore["csvData"]) => {
       store.csvData = data;
     });
+    launchEditor(store)
   } catch (error) {
     console.error(error);
   }

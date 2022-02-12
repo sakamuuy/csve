@@ -1,8 +1,10 @@
-export class CSVStore {
+import { EventEmitter } from 'events'
+export class CSVStore extends EventEmitter {
   private static _instance: CSVStore;
   private _csvData: string[][] | null;
 
   constructor() {
+    super();
     this._csvData = null;
   }
 
@@ -22,5 +24,6 @@ export class CSVStore {
     if (data === null) return;
 
     this._csvData = data;
+    this.emit('setData', this._csvData)
   }
 }
