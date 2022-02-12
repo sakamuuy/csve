@@ -13,3 +13,11 @@ export function getNewlineCharacterReg(option?: NewlineCharacterOptions) {
 }
 
 export const DEFAULT_DELIMITER = ",";
+
+export const DEFAULT_CELL_SIZE = 16
+
+export const PADDING_CHARACTER = " "
+
+export const ELLIPSIS_CHARACTER = "…"
+
+export const EDITOR_CELL_DELIMITER = "|"

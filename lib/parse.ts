@@ -33,7 +33,6 @@ function createTargetReadStream(
   });
 
   rs.on("end", () => {
-    console.log("end");
   });
 
   return rs;
