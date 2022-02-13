@@ -25,15 +25,14 @@ function createTargetReadStream(
       data = parseCSV(chunk.toString());
     }
     // TODO: Handle that if the header size is learger than chunk.
-    const header = data.shift()
+    const header = data.shift();
     onData({
-      header: header?? [],
-      body: data
+      header: header ?? [],
+      body: data,
     });
   });
 
-  rs.on("end", () => {
-  });
+  rs.on("end", () => {});
 
   return rs;
 }

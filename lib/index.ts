@@ -11,7 +11,7 @@ export function csve(argv: NodeJS.Process["argv"]) {
     parse(targetFilePath, (data: CSVStore["csvData"]) => {
       store.csvData = data;
     });
-    launchEditor(store)
+    launchEditor(store);
   } catch (error) {
     console.error(error);
   }
