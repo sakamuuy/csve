@@ -46,15 +46,23 @@ function listenKeyEvent(editor: Editor) {
     // 
     switch (key.toString()) {
       case "c":
-        process.exit();
+        editor.kill();
         break;
 
-      case "a":
-        process.stdout.write("a");
+      case "h":
+        editor.moveToLeft();
         break;
 
-      case "b":
-        process.stdout.cursorTo(1, 1);
+      case "k":
+        editor.moveToAbove();
+        break;
+
+      case "j":
+        editor.moveToBelow();
+        break;
+
+      case "l":
+        editor.moveToRight();
         break;
 
       default:
@@ -70,7 +78,7 @@ function makeRawMode() {
 }
 
 class Editor {
-  private static _instance: Editor;
+  private static _instance: Editor | null;
   private stdout;
 
   constructor() {
@@ -98,7 +106,24 @@ class Editor {
   }
 
   moveToRight() {
+    this.stdout.moveCursor(1, 0);
+  }
+
+  moveToLeft() {
     this.stdout.moveCursor(-1, 0);
+  }
+
+  moveToAbove() {
+    this.stdout.moveCursor(0, -1);
+  }
+
+  moveToBelow() {
+    this.stdout.moveCursor(0, 1);
+  }
+
+  kill() {
+    Editor._instance = null
+    process.exit();
   }
 }
 
