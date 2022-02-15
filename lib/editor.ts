@@ -1,4 +1,5 @@
 import * as readline from "readline";
+import { startListenInput } from "./keyEventListner";
 import { CSVStore } from "./store";
 import {
   DEFAULT_CELL_SIZE,
@@ -6,6 +7,8 @@ import {
   ELLIPSIS_CHARACTER,
   PADDING_CHARACTER,
 } from "./token";
+
+type ModeEntries = 'NORMAL' | 'INSERT' | 'VISUAL' | 'COMMAND'
 
 function paddingCell(text: string) {
   const count = ((str) => {
@@ -41,84 +44,59 @@ function generateBody(body: string[][]) {
   return separatedRows.join("\n");
 }
 
-function listenKeyEvent(editor: Editor) {
-  const mapProcessToKey = (key: Buffer) => {
-    // 
-    switch (key.toString()) {
-      case "c":
-        editor.kill();
-        break;
-
-      case "h":
-        editor.moveToLeft();
-        break;
-
-      case "k":
-        editor.moveToAbove();
-        break;
-
-      case "j":
-        editor.moveToBelow();
-        break;
-
-      case "l":
-        editor.moveToRight();
-        break;
-
-      default:
-        break;
-    }
-  }
-  process.stdin.on("data", mapProcessToKey);
-}
-
 function makeRawMode() {
   readline.emitKeypressEvents(process.stdin);
   process.stdin.setRawMode(true);
 }
 
-class Editor {
+export class Editor {
   private static _instance: Editor | null;
-  private stdout;
+  private _stdout;
+  private _mode: ModeEntries;
 
   constructor() {
-    this.stdout = process.stdout;
+    this._stdout = process.stdout;
+    this._mode = 'NORMAL';
   }
 
-  public static get instance() {
+  static get instance() {
     if (!this._instance) {
       this._instance = new Editor();
     }
     return this._instance;
   }
 
+  get mode() {
+    return this._mode
+  }
+
   write(str: string) {
-    this.stdout.write(str);
+    this._stdout.write(str);
   }
 
   clear() {
-    this.stdout.clearScreenDown();
+    this._stdout.clearScreenDown();
     this.moveTo(1,1);
   }
 
   moveTo(x: number, y?: number) {
-    this.stdout.cursorTo(x, y);
+    this._stdout.cursorTo(x, y);
   }
 
   moveToRight() {
-    this.stdout.moveCursor(1, 0);
+    this._stdout.moveCursor(1, 0);
   }
 
   moveToLeft() {
-    this.stdout.moveCursor(-1, 0);
+    this._stdout.moveCursor(-1, 0);
   }
 
   moveToAbove() {
-    this.stdout.moveCursor(0, -1);
+    this._stdout.moveCursor(0, -1);
   }
 
   moveToBelow() {
-    this.stdout.moveCursor(0, 1);
+    this._stdout.moveCursor(0, 1);
   }
 
   kill() {
@@ -139,7 +117,7 @@ export function launchEditor(store: CSVStore) {
   makeRawMode();
   const editor = Editor.instance;
   editor.clear();
-  listenKeyEvent(editor);
+  startListenInput(editor);
 
   store.on("setData", (data: CSVStore["csvData"]) => {
     initializeView(data, editor);
