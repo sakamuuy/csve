@@ -8,7 +8,11 @@ import {
   PADDING_CHARACTER,
 } from "./token";
 
-type ModeEntries = 'NORMAL' | 'INSERT' | 'VISUAL' | 'COMMAND'
+const NORMAL_MODE = "NORMAL" as const
+const INSERT_MODE = "INSERT" as const
+const VISUAL_MODE = "VISUAL" as const
+const COMMAND_MODE = "COMMAND" as const
+export type ModeEntries = typeof NORMAL_MODE | typeof INSERT_MODE | typeof VISUAL_MODE | typeof COMMAND_MODE;
 
 function paddingCell(text: string) {
   const count = ((str) => {
@@ -56,7 +60,7 @@ export class Editor {
 
   constructor() {
     this._stdout = process.stdout;
-    this._mode = 'NORMAL';
+    this._mode = "NORMAL";
   }
 
   static get instance() {
@@ -67,7 +71,7 @@ export class Editor {
   }
 
   get mode() {
-    return this._mode
+    return this._mode;
   }
 
   write(str: string) {
@@ -76,7 +80,7 @@ export class Editor {
 
   clear() {
     this._stdout.clearScreenDown();
-    this.moveTo(1,1);
+    this.moveTo(1, 1);
   }
 
   moveTo(x: number, y?: number) {
@@ -99,8 +103,24 @@ export class Editor {
     this._stdout.moveCursor(0, 1);
   }
 
+  insertMode() {
+    this._mode = "INSERT"
+  }
+
+  normalMode() {
+    this._mode = "NORMAL"
+  }
+
+  visualMode() {
+    this._mode = "VISUAL"
+  }
+
+  commandMode() {
+    this._mode = "COMMAND"
+  }
+
   kill() {
-    Editor._instance = null
+    Editor._instance = null;
     process.exit();
   }
 }
