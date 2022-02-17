@@ -11,19 +11,19 @@ function mapNormalKeyEvent(key: Key){
       break;
 
     case "h":
-      editor.moveCellToLeft();
+      editor.moveByCellToLeft();
       break;
 
     case "k":
-      editor.moveCellToAbove();
+      editor.moveByCellToAbove();
       break;
 
     case "j":
-      editor.moveCellToBelow();
+      editor.moveByCellToBelow();
       break;
 
     case "l":
-      editor.moveCellToRight();
+      editor.moveByCellToRight();
       break;
 
     default:

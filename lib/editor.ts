@@ -53,19 +53,47 @@ function makeRawMode() {
   process.stdin.setRawMode(true);
 }
 
+type CursorPosition = {
+  x: number;
+  y: number;
+}
 export class Editor {
   private static _instance: Editor | null;
   private _stdout;
   private _mode: ModeEntries;
+  private _columnLength: number;
+  private _rowLength: number;
+  private _cursorPosition: CursorPosition;
 
-  constructor() {
+  constructor(colL: number, rowL: number) {
     this._stdout = process.stdout;
     this._mode = "NORMAL";
+    this._columnLength = colL;
+    this._rowLength = rowL;
+    this._cursorPosition= {
+      x: 0,
+      y: 0
+    }
+  }
+
+  private _canMoveByCell(afterX: number, afterY: number) {
+    if (afterX > this._columnLength || 
+        afterX < 0 || 
+        afterY > this._rowLength ||
+        afterY < 0) {
+      return false;
+    }
+    return true;
+  }
+
+  private _cacheCurrentPos(x: number, y: number) {
+    this._cursorPosition = {x,y}
   }
 
   static get instance() {
     if (!this._instance) {
-      this._instance = new Editor();
+      const store = CSVStore.instance
+      this._instance = new Editor(store.csvData?.header.length ?? 0, store.csvData?.body.length ?? 0);
     }
     return this._instance;
   }
@@ -74,17 +102,25 @@ export class Editor {
     return this._mode;
   }
 
+  set colLength(l: number) {
+    this._columnLength = l * DEFAULT_CELL_SIZE
+  }
+
+  set rowLength(l: number) {
+    this._rowLength = l;
+  }
+
   write(str: string) {
     this._stdout.write(str);
   }
 
   clear() {
-    this.moveTo(0, 0);
+    this.moveToOrigin();
     this._stdout.clearScreenDown();
   }
 
-  moveTo(x: number, y?: number) {
-    this._stdout.cursorTo(x, y);
+  moveToOrigin() {
+    this._stdout.cursorTo(0, 0);
   }
 
   moveToRight() {
@@ -103,19 +139,23 @@ export class Editor {
     this._stdout.moveCursor(0, 1);
   }
 
-  moveCellToRight() {
+  moveByCellToRight() {
+    this._canMoveByCell(this._cursorPosition.x + DEFAULT_CELL_SIZE, this._cursorPosition.y) && 
     this._stdout.moveCursor(DEFAULT_CELL_SIZE, 0);
   }
 
-  moveCellToLeft() {
+  moveByCellToLeft() {
+    this._canMoveByCell(this._cursorPosition.x - DEFAULT_CELL_SIZE, this._cursorPosition.y) && 
     this._stdout.moveCursor(-DEFAULT_CELL_SIZE, 0);
   }
 
-  moveCellToAbove() {
+  moveByCellToAbove() {
+    this._canMoveByCell(this._cursorPosition.x, this._cursorPosition.y -1) && 
     this._stdout.moveCursor(0, -1);
   }
 
-  moveCellToBelow() {
+  moveByCellToBelow() {
+    this._canMoveByCell(this._cursorPosition.x, this._cursorPosition.y + 1) && 
     this._stdout.moveCursor(0, 1);
   }
 
@@ -147,6 +187,9 @@ function initializeView(data: CSVStore["csvData"], editor: Editor) {
   editor.write(generateHeader(header));
   editor.write("\n");
   editor.write(generateBody(body));
+  editor.colLength = header.length;
+  editor.rowLength = body.length;
+  editor.moveToOrigin();
 }
 
 export function launchEditor(store: CSVStore) {
