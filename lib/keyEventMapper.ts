@@ -1,7 +1,7 @@
 import { Editor, ModeEntries } from "./editor";
 import { Key } from "./keyEventListner";
 
-const editor = Editor.instance
+let editor: Editor;
 
 function mapNormalKeyEvent(key: Key){
   switch (key.sequence) {
@@ -11,19 +11,19 @@ function mapNormalKeyEvent(key: Key){
       break;
 
     case "h":
-      editor.moveToLeft();
+      editor.moveCellToLeft();
       break;
 
     case "k":
-      editor.moveToAbove();
+      editor.moveCellToAbove();
       break;
 
     case "j":
-      editor.moveToBelow();
+      editor.moveCellToBelow();
       break;
 
     case "l":
-      editor.moveToRight();
+      editor.moveCellToRight();
       break;
 
     default:
@@ -44,6 +44,8 @@ function mapCommandKeyEvent(key: Key) {
 }
 
 export function generateKeyEventMapper(mode: ModeEntries) {
+  editor = Editor.instance
+
   switch (mode) {
     case "NORMAL": return mapNormalKeyEvent
     case "INSERT": return mapInsertKeyEvent

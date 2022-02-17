@@ -79,8 +79,8 @@ export class Editor {
   }
 
   clear() {
+    this.moveTo(0, 0);
     this._stdout.clearScreenDown();
-    this.moveTo(1, 1);
   }
 
   moveTo(x: number, y?: number) {
@@ -100,6 +100,22 @@ export class Editor {
   }
 
   moveToBelow() {
+    this._stdout.moveCursor(0, 1);
+  }
+
+  moveCellToRight() {
+    this._stdout.moveCursor(DEFAULT_CELL_SIZE, 0);
+  }
+
+  moveCellToLeft() {
+    this._stdout.moveCursor(-DEFAULT_CELL_SIZE, 0);
+  }
+
+  moveCellToAbove() {
+    this._stdout.moveCursor(0, -1);
+  }
+
+  moveCellToBelow() {
     this._stdout.moveCursor(0, 1);
   }
 
